@@ -24,7 +24,7 @@ export const getProgressById = async (id: string): Promise<Progress | null> => {
 export const upsertProgress = async (progress: Progress): Promise<Progress> => {
   await ensureMongooseConnected()
 
-  const doc = await ProgressModel.findOneAndUpdate(
+  await ProgressModel.updateOne(
     { _id: progress.id },
     {
       $set: {
@@ -35,13 +35,10 @@ export const upsertProgress = async (progress: Progress): Promise<Progress> => {
       },
       $setOnInsert: { _id: progress.id },
     },
-    {
-      upsert: true,
-      new: true,
-      runValidators: true,
-    },
+    { upsert: true, runValidators: true },
   ).exec()
 
+  const doc = await ProgressModel.findById(progress.id).exec()
   if (!doc) {
     throw new Error('Failed to upsert progress')
   }

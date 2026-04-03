@@ -1,16 +1,15 @@
 import { z } from 'zod'
 
-export const ProgressIdSchema = z.string()
+export const ProgressIdSchema = z.string().min(1)
 
 const CoercedIntSchema = z.coerce.number().int()
 
-export const ProgressGetParamsSchema = z.object({
+export const ProgressParamsSchema = z.object({
   id: ProgressIdSchema,
 })
 
 export const ProgressUpsertBodySchema = z
   .object({
-    id: ProgressIdSchema.optional(),
     completed: CoercedIntSchema,
     total: CoercedIntSchema,
     startTime: z.coerce.date(),

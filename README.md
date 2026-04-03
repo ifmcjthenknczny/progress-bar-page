@@ -5,7 +5,7 @@ A small Nuxt 4 app that stores and displays long-running progress in MongoDB.
 ## What’s included
 - REST endpoints:
   - `GET  /api/progress/:id` - fetch progress by UUID
-  - `POST /api/progress/:id` - upsert progress by UUID
+  - `POST /api/progress/:id` - upsert progress (body: `completed`, `total`, `startTime`; header `x-api-key`; response: `{ id }`)
 - Frontend page:
   - `/?id=<uuid>` - shows an animated progress bar, percentages, average time per item, ETA, and due time
 

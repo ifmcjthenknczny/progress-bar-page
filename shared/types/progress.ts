@@ -15,7 +15,6 @@ export interface ProgressJson extends ProgressFields {
 }
 
 export interface ProgressUpsertBody {
-  id?: string
   completed: number
   total: number
   startTime: Date

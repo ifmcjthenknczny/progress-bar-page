@@ -1,9 +1,9 @@
 import { createError, defineEventHandler } from 'h3'
 import { getProgressById } from '../../db/progressRepo'
-import { ProgressGetParamsSchema } from '../../schemas/progress'
+import { ProgressParamsSchema } from '../../schemas/progress'
 
 export default defineEventHandler(async (event) => {
-  const parsed = ProgressGetParamsSchema.safeParse(event.context.params)
+  const parsed = ProgressParamsSchema.safeParse(event.context.params)
   if (!parsed.success) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid param: id' })
   }

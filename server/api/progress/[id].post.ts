@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
 import type { Progress } from '#shared/types/progress'
-import { ProgressIdSchema, ProgressUpsertBodySchema } from '../../schemas/progress'
+import { ProgressParamsSchema, ProgressUpsertBodySchema } from '../../schemas/progress'
 import { upsertProgress } from '../../db/progressRepo'
 
 export default defineEventHandler(async (event) => {
@@ -14,26 +14,26 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
+  const paramsParse = ProgressParamsSchema.safeParse(event.context.params)
+  if (!paramsParse.success) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid param: id' })
+  }
+
   const rawBody = await readBody(event)
   const bodyParse = ProgressUpsertBodySchema.safeParse(rawBody)
   if (!bodyParse.success) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid request body' })
   }
 
-  const idCandidate = bodyParse.data.id ?? event.context.params?.id
-  const idParse = ProgressIdSchema.safeParse(idCandidate)
-  if (!idParse.success) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid param: id' })
-  }
-
   const progress: Progress = {
-    id: idParse.data,
+    id: paramsParse.data.id,
     completed: bodyParse.data.completed,
     total: bodyParse.data.total,
     startTime: bodyParse.data.startTime,
     updatedAt: new Date(),
   }
 
-  return upsertProgress(progress)
-})
+  await upsertProgress(progress)
 
+  return { id: paramsParse.data.id }
+})
