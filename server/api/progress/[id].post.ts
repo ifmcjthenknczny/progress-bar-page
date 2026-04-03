@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
     completed: bodyParse.data.completed,
     total: bodyParse.data.total,
     startTime: bodyParse.data.startTime,
+    updatedAt: new Date(),
   }
 
   return upsertProgress(progress)

@@ -77,7 +77,7 @@
         </div>
         <div class="small">
           <span class="small__k">Updated at:</span>
-          <span class="value value--muted">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</span>
+          <span class="value value--mono">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</span>
         </div>
       </div>
     </div>
