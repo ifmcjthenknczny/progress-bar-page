@@ -2,85 +2,63 @@
   <div class="page">
     <h1>Progress</h1>
 
-    <div v-if="error" class="card card--error">
+    <Card v-if="error" error>
       <div class="card__title">Failed to load data</div>
       <div class="card__body">{{ error }}</div>
-    </div>
+    </Card>
 
-    <div v-else-if="!id" class="card">
+    <Card v-else-if="!id">
       <div class="card__title">Missing query parameter</div>
       <div class="card__body">
         Open <code>/?id=&lt;uuid&gt;</code>
       </div>
-    </div>
+    </Card>
 
-    <div v-else-if="!data" class="card">
+    <Card v-else-if="!data">
       <div class="card__title">Loading...</div>
       <div class="card__body">Fetching progress state from the database.</div>
-    </div>
+    </Card>
 
-    <div v-else class="card">
+    <Card v-else>
       <div class="row row--between row--wrap">
-        <div>
-          <div class="label">Processed</div>
-          <div class="value">
-            {{ data.completed }} / {{ data.total }}
-          </div>
-        </div>
+        <Stat label="Processed">
+          {{ data.completed }} / {{ data.total }}
+        </Stat>
 
-        <div class="stat">
-          <div class="label">Remaining</div>
-          <div class="value">
-            {{ remainingItems }} / {{ data.total }}
-          </div>
-        </div>
+        <Stat label="Remaining" align-end>
+          {{ remainingItems }} / {{ data.total }}
+        </Stat>
       </div>
 
-      <div class="bar">
-        <div class="bar__track" aria-hidden="true">
-          <div class="bar__fill" :style="{ width: `${progressPercent}%` }" />
-          <div class="bar__shine" />
-        </div>
-        <div class="bar__meta">
-          <div class="bar__scale">0%</div>
-          <div class="bar__percent">{{ progressPercent.toFixed(1) }}%</div>
-          <div class="bar__scale">100%</div>
-        </div>
-      </div>
+      <Bar :percent="progressPercent" />
 
       <div class="grid">
-        <div class="cell">
-          <div class="label">Average time / item</div>
+        <Cell>
+          <template #label>Average time / item</template>
           <div class="value" v-if="avgPerItemMs !== null">{{ formatDuration(avgPerItemMs) }}</div>
           <div class="value value--muted" v-else>—</div>
-        </div>
+        </Cell>
 
-        <div class="cell">
-          <div class="label">ETA (remaining duration)</div>
+        <Cell>
+          <template #label>ETA (remaining duration)</template>
           <div class="value" v-if="etaMs !== null">{{ formatDuration(etaMs) }}</div>
           <div class="value value--muted" v-else>—</div>
-        </div>
+        </Cell>
 
-        <div class="cell">
-          <div class="label">Due time</div>
+        <Cell>
+          <template #label>Due time</template>
           <div class="value" v-if="etaDueAt">{{ formatDateTime(etaDueAt) }}</div>
           <div class="value value--muted" v-else>—</div>
-        </div>
+        </Cell>
       </div>
 
       <div class="divider" />
 
       <div class="row row--between row--wrap">
-        <div class="small">
-          <span class="small__k">Start time:</span>
-          <span class="value value--mono">{{ formatDateTime(data.startTime) }}</span>
-        </div>
-        <div class="small">
-          <span class="small__k">Updated at:</span>
-          <span class="value value--mono">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</span>
-        </div>
+        <Small label="Start time:">{{ formatDateTime(data.startTime) }}</Small>
+        <Small label="Updated at:">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</Small>
       </div>
-    </div>
+    </Card>
   </div>
 </template>
 
@@ -255,28 +233,6 @@ h1 {
   text-align: center;
 }
 
-.card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 18px;
-  backdrop-filter: blur(10px);
-}
-
-.card--error {
-  background: rgba(255, 0, 64, 0.08);
-  border-color: rgba(255, 0, 64, 0.25);
-}
-
-.card__title {
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.card__body {
-  color: rgba(255, 255, 255, 0.85);
-}
-
 .row {
   display: flex;
   align-items: center;
@@ -289,71 +245,6 @@ h1 {
 
 .row--wrap {
   flex-wrap: wrap;
-}
-
-.bar {
-  margin-top: 14px;
-}
-
-.bar__track {
-  position: relative;
-  height: 18px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.bar__fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #22c55e 0%, #3b82f6 100%);
-  box-shadow: 0 0 18px rgba(59, 130, 246, 0.35);
-  transition: width 300ms ease;
-}
-
-.bar__shine {
-  position: absolute;
-  top: -40%;
-  left: -20%;
-  width: 60%;
-  height: 180%;
-  transform: rotate(12deg);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0) 100%);
-  animation: shine 1.4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes shine {
-  0% {
-    transform: translateX(-40%) rotate(12deg);
-    opacity: 0.1;
-  }
-  50% {
-    opacity: 0.35;
-  }
-  100% {
-    transform: translateX(160%) rotate(12deg);
-    opacity: 0.1;
-  }
-}
-
-.bar__meta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.bar__percent {
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.bar__scale {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
-  font-weight: 700;
 }
 
 .grid {
@@ -375,55 +266,9 @@ h1 {
   }
 }
 
-.cell {
-  padding: 12px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 6px;
-}
-
-.value {
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.value--muted {
-  color: rgba(255, 255, 255, 0.45);
-  font-weight: 700;
-}
-
-.value--mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
-  font-weight: 700;
-}
-
-.stat {
-  min-width: 160px;
-  text-align: right;
-}
-
 .divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
   margin: 16px 0;
 }
-
-.small {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 13px;
-}
-
-.small__k {
-  display: inline-block;
-  width: 140px;
-  color: rgba(255, 255, 255, 0.55);
-}
 </style>
-
