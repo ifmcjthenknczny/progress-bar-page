@@ -6,10 +6,12 @@ export interface ProgressFields {
 
 export interface Progress extends ProgressFields {
   startTime: Date
+  updatedAt: Date
 }
 
 export interface ProgressJson extends ProgressFields {
   startTime: string
+  updatedAt: string
 }
 
 export interface ProgressUpsertBody {

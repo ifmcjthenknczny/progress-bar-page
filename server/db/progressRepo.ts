@@ -17,6 +17,7 @@ export const getProgressById = async (id: string): Promise<Progress | null> => {
     completed: obj.completed,
     total: obj.total,
     startTime: obj.startTime,
+    updatedAt: obj.updatedAt ?? obj.startTime,
   }
 }
 
@@ -30,6 +31,7 @@ export const upsertProgress = async (progress: Progress): Promise<Progress> => {
         completed: progress.completed,
         total: progress.total,
         startTime: progress.startTime,
+        updatedAt: new Date(),
       },
       $setOnInsert: { _id: progress.id },
     },
@@ -50,6 +52,7 @@ export const upsertProgress = async (progress: Progress): Promise<Progress> => {
     completed: obj.completed,
     total: obj.total,
     startTime: obj.startTime,
+    updatedAt: obj.updatedAt ?? obj.startTime,
   }
 }
 

@@ -76,8 +76,8 @@
           <span class="value value--mono">{{ formatDateTime(data.startTime) }}</span>
         </div>
         <div class="small">
-          <span class="small__k">Last update:</span>
-          <span class="value value--muted">{{ refreshInfo }}</span>
+          <span class="small__k">Updated at:</span>
+          <span class="value value--muted">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</span>
         </div>
       </div>
     </div>
@@ -104,7 +104,6 @@ const id = computed(() => {
 
 const data = ref<ProgressJson | null>(null)
 const error = ref<string | null>(null)
-const refreshInfo = ref<string>('—')
 
 let timer: ReturnType<typeof setInterval> | null = null
 
@@ -117,11 +116,9 @@ const load = async () => {
   try {
     const res = await $fetch<ProgressJson>(`/api/progress/${encodeURIComponent(id.value)}`)
     data.value = res
-    refreshInfo.value = 'OK'
   } catch (e: any) {
     data.value = null
     error.value = e?.data?.statusMessage ?? e?.message ?? 'Unknown error'
-    refreshInfo.value = 'ERR'
   }
 }
 
@@ -146,7 +143,6 @@ onBeforeUnmount(() => {
 watch(id, () => {
   data.value = null
   error.value = null
-  refreshInfo.value = '—'
   startPolling()
 })
 
@@ -163,6 +159,10 @@ const toDate = (value: unknown): Date | null => {
 
 const startDate = computed(() => {
   return data.value ? toDate(data.value.startTime) : null
+})
+
+const updatedAtDate = computed(() => {
+  return data.value ? toDate(data.value.updatedAt) : null
 })
 
 const startTimeMs = computed(() => {

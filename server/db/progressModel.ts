@@ -22,6 +22,7 @@ const progressSchema = new Schema(
       },
     },
     startTime: { type: Date, required: true },
+    updatedAt: { type: Date, required: true },
   },
   {
     collection: progressCollectionName,
