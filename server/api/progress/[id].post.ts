@@ -1,6 +1,7 @@
 import { createError, defineEventHandler, readBody } from 'h3'
+import type { Progress } from '#shared/types/progress'
 import { ProgressIdSchema, ProgressUpsertBodySchema } from '../../schemas/progress'
-import { type Progress, upsertProgress } from '../../db/progressRepo'
+import { upsertProgress } from '../../db/progressRepo'
 
 export default defineEventHandler(async (event) => {
   const rawBody = await readBody(event)

@@ -1,12 +1,8 @@
+import type { Progress } from '#shared/types/progress'
 import { ProgressModel } from './progressModel'
 import { ensureMongooseConnected } from './mongoose'
 
-export type Progress = {
-  id: string
-  completed: number
-  total: number
-  startTime: Date
-}
+export type { Progress } from '#shared/types/progress'
 
 export const getProgressById = async (id: string): Promise<Progress | null> => {
   await ensureMongooseConnected()
