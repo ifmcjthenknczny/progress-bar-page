@@ -47,7 +47,7 @@
 
         <Cell>
           <template #label>ETA (remaining duration)</template>
-          <div class="value" v-if="etaMs !== null">{{ formatDuration(etaMs) }}</div>
+          <div class="value" v-if="etaMsLive !== null">{{ formatDuration(etaMsLive) }}</div>
           <div class="value value--muted" v-else>—</div>
         </Cell>
 
@@ -205,6 +205,17 @@ const etaMs = computed(() => {
     return null
   }
   return avgPerItemMs.value * remainingItems.value
+})
+
+const etaMsLive = computed(() => {
+  if (etaMs.value === null) {
+    return null
+  }
+  if (!updatedAtDate.value) {
+    return etaMs.value
+  }
+  const drift = nowMs.value - updatedAtDate.value.getTime()
+  return Math.max(0, etaMs.value - drift)
 })
 
 const etaDueAt = computed(() => {
