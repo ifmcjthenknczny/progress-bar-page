@@ -1,75 +1,45 @@
-# Nuxt Minimal Starter
+# Progress Bar Page (Nuxt 4 + MongoDB)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A small Nuxt 4 app that stores and displays long-running progress in MongoDB.
 
-## Setup
+## What’s included
+- REST endpoints:
+  - `GET  /api/progress/:id` - fetch progress by UUID
+  - `POST /api/progress/:id` - upsert progress by UUID
+- Frontend page:
+  - `/?id=<uuid>` - shows an animated progress bar, percentages, average time per item, ETA, and due time
 
-Make sure to install dependencies:
+## MongoDB document shape
+The `progress` collection stores:
+`{ id: string, completed: int, total: int, startTime: Date }`
 
+## Environment variables
+Copy `.env.example` to `.env`:
+- `MONGODB_URI` (required)
+- `MONGODB_DB` (optional, default: `progressdb`)
+- `MONGODB_COLLECTION` (optional, default: `progress`)
+
+## Run it
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
 yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
 yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Open:
+- `http://localhost:3000/?id=<uuid>`
 
-Build the application for production:
-
+## Build
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
 yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+## License
 
-```bash
-# npm
-npm run preview
+This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/).
 
-# pnpm
-pnpm preview
+## Contact
 
-# yarn
-yarn preview
+For questions or feedback, please reach out via GitHub.
+[ifmcjthenknczny](https://github.com/ifmcjthenknczny)  
 
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Project Link: [https://github.com/ifmcjthenknczny/progress-bar-page](https://github.com/ifmcjthenknczny/progress-bar-page)

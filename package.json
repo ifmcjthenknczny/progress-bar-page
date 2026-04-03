@@ -1,7 +1,9 @@
 {
   "name": "progress-bar-page",
+  "version": "0.1.0",
   "type": "module",
   "private": true,
+  "license": "CC-BY-NC-4.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
