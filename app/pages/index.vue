@@ -34,6 +34,12 @@
 
       <div class="grid">
         <Cell>
+          <template #label>Running time</template>
+          <div class="value" v-if="runningTimeMs !== null">{{ formatDuration(runningTimeMs) }}</div>
+          <div class="value value--muted" v-else>—</div>
+        </Cell>
+
+        <Cell>
           <template #label>Average time / item</template>
           <div class="value" v-if="avgPerItemMs !== null">{{ formatAvgPerItemSec(avgPerItemMs) }}</div>
           <div class="value value--muted" v-else>—</div>
@@ -58,6 +64,7 @@
         <Small label="Start time:">{{ formatDateTime(data.startTime) }}</Small>
         <Small label="Last updated at:">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</Small>
       </div>
+
     </Card>
   </div>
 </template>
@@ -84,6 +91,9 @@ const data = ref<ProgressJson | null>(null)
 const error = ref<string | null>(null)
 
 let timer: ReturnType<typeof setInterval> | null = null
+let clockTimer: ReturnType<typeof setInterval> | null = null
+
+const nowMs = ref(Date.now())
 
 const load = async () => {
   if (!id.value) {
@@ -101,7 +111,9 @@ const load = async () => {
 }
 
 const startPolling = () => {
-  if (timer) clearInterval(timer)
+  if (timer) {
+    clearInterval(timer)
+  }
   if (!id.value) {
     return
   }
@@ -112,10 +124,18 @@ const startPolling = () => {
 
 onMounted(() => {
   startPolling()
+  clockTimer = setInterval(() => {
+    nowMs.value = Date.now()
+  }, 1000)
 })
 
 onBeforeUnmount(() => {
-  if (timer) clearInterval(timer)
+  if (timer) {
+    clearInterval(timer)
+  }
+  if (clockTimer) {
+    clearInterval(clockTimer)
+  }
 })
 
 watch(id, () => {
@@ -187,6 +207,14 @@ const etaDueAt = computed(() => {
     return null
   }
   return new Date(updatedAtDate.value.getTime() + etaMs.value)
+})
+
+const runningTimeMs = computed(() => {
+  if (startTimeMs.value === null) {
+    return null
+  }
+  const ms = nowMs.value - startTimeMs.value
+  return ms >= 0 ? ms : null
 })
 
 const formatAvgPerItemSec = (ms: number) => {
@@ -263,7 +291,7 @@ h1 {
 .grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 16px;
 }
 
@@ -283,5 +311,17 @@ h1 {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
   margin: 16px 0;
+}
+
+.running-time {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.running-time :deep(.cell) {
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
 }
 </style>
