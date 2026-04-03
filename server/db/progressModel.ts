@@ -1,8 +1,10 @@
 import mongoose, { Schema, type InferSchemaType } from 'mongoose'
 
+const progressCollectionName = process.env.MONGODB_COLLECTION || 'progress'
+
 const progressSchema = new Schema(
   {
-    id: { type: String, required: true, unique: true, index: true },
+    _id: { type: String, required: true, unique: true, index: true },
     completed: {
       type: Number,
       required: true,
@@ -22,7 +24,7 @@ const progressSchema = new Schema(
     startTime: { type: Date, required: true },
   },
   {
-    collection: 'progress',
+    collection: progressCollectionName,
     versionKey: false,
     timestamps: false,
   },

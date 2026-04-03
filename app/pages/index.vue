@@ -42,7 +42,9 @@
           <div class="bar__shine" />
         </div>
         <div class="bar__meta">
+          <div class="bar__scale">0%</div>
           <div class="bar__percent">{{ progressPercent.toFixed(1) }}%</div>
+          <div class="bar__scale">100%</div>
         </div>
       </div>
 
@@ -63,16 +65,6 @@
           <div class="label">Due time</div>
           <div class="value" v-if="etaDueAt">{{ formatDateTime(etaDueAt) }}</div>
           <div class="value value--muted" v-else>—</div>
-        </div>
-
-        <div class="cell">
-          <div class="label">Totals</div>
-          <div class="value">
-            {{ data.completed }} done
-          </div>
-          <div class="value value--muted">
-            {{ remainingItems }} left, {{ data.total }} total
-          </div>
         </div>
       </div>
 
@@ -95,6 +87,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { PROGRESS_REFRESH_INTERVAL_MS } from '#shared/config'
 import type { ProgressJson } from '#shared/types/progress'
 
 const route = useRoute()
@@ -139,7 +132,7 @@ const startPolling = () => {
   }
 
   void load()
-  timer = setInterval(() => void load(), 1500)
+  timer = setInterval(() => void load(), PROGRESS_REFRESH_INTERVAL_MS)
 }
 
 onMounted(() => {
@@ -157,12 +150,23 @@ watch(id, () => {
   startPolling()
 })
 
-const startTimeMs = computed(() => {
-  if (!data.value) {
-    return null
+const toDate = (value: unknown): Date | null => {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value
   }
-  const ms = new Date(data.value.startTime).getTime()
-  return Number.isNaN(ms) ? null : ms
+  if (typeof value === 'string' || typeof value === 'number') {
+    const d = new Date(value)
+    return Number.isNaN(d.getTime()) ? null : d
+  }
+  return null
+}
+
+const startDate = computed(() => {
+  return data.value ? toDate(data.value.startTime) : null
+})
+
+const startTimeMs = computed(() => {
+  return startDate.value ? startDate.value.getTime() : null
 })
 
 const remainingItems = computed(() => {
@@ -215,8 +219,8 @@ const formatDuration = (ms: number) => {
 }
 
 const formatDateTime = (value: string | Date) => {
-  const d = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(d.getTime())) {
+  const d = toDate(value)
+  if (!d) {
     return '—'
   }
   return new Intl.DateTimeFormat(undefined, {
@@ -248,6 +252,7 @@ h1 {
   margin: 0 0 16px;
   font-size: 28px;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
 .card {
@@ -295,6 +300,8 @@ h1 {
   height: 18px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  box-sizing: border-box;
   overflow: hidden;
 }
 
@@ -334,7 +341,7 @@ h1 {
 
 .bar__meta {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 8px;
 }
 
@@ -343,10 +350,16 @@ h1 {
   letter-spacing: -0.02em;
 }
 
+.bar__scale {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 16px;
 }
 

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const ProgressIdSchema = z.string().uuid()
+export const ProgressIdSchema = z.string()
 
 const CoercedIntSchema = z.coerce.number().int()
 

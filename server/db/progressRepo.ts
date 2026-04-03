@@ -6,28 +6,32 @@ export type { Progress } from '#shared/types/progress'
 
 export const getProgressById = async (id: string): Promise<Progress | null> => {
   await ensureMongooseConnected()
-  const doc = await ProgressModel.findOne({ id }).exec()
+  const doc = (await ProgressModel.findById(id).exec()) ?? (await ProgressModel.findOne({ _id: id }).exec())
   if (!doc) {
     return null
   }
 
   const obj = doc.toObject() as any
-  delete obj._id
-  return obj as Progress
+  return {
+    id: typeof obj._id === 'string' ? obj._id : String(obj.id ?? obj._id),
+    completed: obj.completed,
+    total: obj.total,
+    startTime: obj.startTime,
+  }
 }
 
 export const upsertProgress = async (progress: Progress): Promise<Progress> => {
   await ensureMongooseConnected()
 
   const doc = await ProgressModel.findOneAndUpdate(
-    { id: progress.id },
+    { _id: progress.id },
     {
       $set: {
         completed: progress.completed,
         total: progress.total,
         startTime: progress.startTime,
       },
-      $setOnInsert: { id: progress.id },
+      $setOnInsert: { _id: progress.id },
     },
     {
       upsert: true,
@@ -41,7 +45,11 @@ export const upsertProgress = async (progress: Progress): Promise<Progress> => {
   }
 
   const obj = doc.toObject() as any
-  delete obj._id
-  return obj as Progress
+  return {
+    id: String(obj._id),
+    completed: obj.completed,
+    total: obj.total,
+    startTime: obj.startTime,
+  }
 }
 

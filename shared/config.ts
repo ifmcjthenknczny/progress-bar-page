@@ -1,0 +1,1 @@
+export const PROGRESS_REFRESH_INTERVAL_MS = 15_000
