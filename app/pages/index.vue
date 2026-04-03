@@ -214,9 +214,19 @@ const etaDueAt = computed(() => {
   return new Date(updatedAtDate.value.getTime() + etaMs.value)
 })
 
+const jobComplete = computed(() => {
+  if (!data.value || data.value.total <= 0) {
+    return false
+  }
+  return data.value.completed >= data.value.total
+})
+
 const runningTimeMs = computed(() => {
   if (startTimeMs.value === null) {
     return null
+  }
+  if (jobComplete.value && elapsedMsToUpdatedAt.value !== null) {
+    return elapsedMsToUpdatedAt.value
   }
   const ms = nowMs.value - startTimeMs.value
   return ms >= 0 ? ms : null
