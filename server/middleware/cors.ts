@@ -13,7 +13,7 @@ export default defineEventHandler((event) => {
 
   const allowHeaders =
     process.env.CORS_ALLOW_HEADERS?.trim() ??
-    'Content-Type, Authorization, x-api-key'
+    'Content-Type, Authorization, x-api-key, X-API-Key'
 
   let allowOrigin: string | null = null
   if (configured === '*') {
@@ -23,6 +23,13 @@ export default defineEventHandler((event) => {
     const reqOrigin = getHeader(event, 'origin')
     if (reqOrigin && allowed.includes(reqOrigin)) {
       allowOrigin = reqOrigin
+    } else if (reqOrigin) {
+      console.warn(
+        '[CORS] Origin not in CORS_ORIGIN — browser will hide response body. Origin:',
+        reqOrigin,
+        'allowed:',
+        configured,
+      )
     }
   }
 
