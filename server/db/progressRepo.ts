@@ -18,21 +18,27 @@ export const getProgressById = async (id: string): Promise<Progress | null> => {
     total: obj.total,
     startTime: obj.startTime,
     updatedAt: obj.updatedAt ?? obj.startTime,
+    ...(typeof obj.name === 'string' && obj.name.length > 0 ? { name: obj.name } : {}),
   }
 }
 
 export const upsertProgress = async (progress: Progress): Promise<Progress> => {
   await ensureMongooseConnected()
 
+  const $set: Record<string, unknown> = {
+    completed: progress.completed,
+    total: progress.total,
+    startTime: progress.startTime,
+    updatedAt: new Date(),
+  }
+  if (progress.name !== undefined) {
+    $set.name = progress.name
+  }
+
   await ProgressModel.updateOne(
     { _id: progress.id },
     {
-      $set: {
-        completed: progress.completed,
-        total: progress.total,
-        startTime: progress.startTime,
-        updatedAt: new Date(),
-      },
+      $set,
       $setOnInsert: { _id: progress.id },
     },
     { upsert: true, runValidators: true },
@@ -50,6 +56,7 @@ export const upsertProgress = async (progress: Progress): Promise<Progress> => {
     total: obj.total,
     startTime: obj.startTime,
     updatedAt: obj.updatedAt ?? obj.startTime,
+    ...(typeof obj.name === 'string' && obj.name.length > 0 ? { name: obj.name } : {}),
   }
 }
 

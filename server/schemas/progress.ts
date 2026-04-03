@@ -13,6 +13,7 @@ export const ProgressUpsertBodySchema = z
     completed: CoercedIntSchema,
     total: CoercedIntSchema,
     startTime: z.coerce.date(),
+    name: z.string().max(500).optional(),
   })
   .refine((data) => !Number.isNaN(data.startTime.getTime()), {
     message: '`startTime` must be a valid date',

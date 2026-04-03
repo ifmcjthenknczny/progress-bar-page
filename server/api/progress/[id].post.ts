@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     log('invalid body', rawBody, zodFieldIssues(bodyParse.error))
     throw badRequest('Invalid request body', {
       ...zodFieldIssues(bodyParse.error),
-      hint: 'Expected JSON: { completed, total, startTime } (startTime = ISO string or number)',
+      hint: 'Expected JSON: { completed, total, startTime } optional name; startTime = ISO string or number',
       receivedType: rawBody === null || rawBody === undefined ? 'empty/null' : typeof rawBody,
     })
   }
@@ -65,6 +65,7 @@ export default defineEventHandler(async (event) => {
     total: bodyParse.data.total,
     startTime: bodyParse.data.startTime,
     updatedAt: new Date(),
+    ...(bodyParse.data.name !== undefined ? { name: bodyParse.data.name } : {}),
   }
 
   try {

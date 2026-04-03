@@ -2,6 +2,7 @@ export interface ProgressFields {
   id: string
   completed: number
   total: number
+  name?: string
 }
 
 export interface Progress extends ProgressFields {
@@ -18,4 +19,5 @@ export interface ProgressUpsertBody {
   completed: number
   total: number
   startTime: Date
+  name?: string
 }

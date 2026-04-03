@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h1>Progress</h1>
+    <h1>{{ progressHeading }}</h1>
 
     <Card v-if="error" error>
       <div class="card__title">Failed to load data</div>
@@ -89,6 +89,11 @@ const id = computed(() => {
 
 const data = ref<ProgressJson | null>(null)
 const error = ref<string | null>(null)
+
+const progressHeading = computed(() => {
+  const n = data.value?.name?.trim()
+  return n ? `Progress of ${n}` : 'Progress'
+})
 
 let timer: ReturnType<typeof setInterval> | null = null
 let clockTimer: ReturnType<typeof setInterval> | null = null
