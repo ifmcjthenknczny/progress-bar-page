@@ -35,7 +35,7 @@
       <div class="grid">
         <Cell>
           <template #label>Average time / item</template>
-          <div class="value" v-if="avgPerItemMs !== null">{{ formatDuration(avgPerItemMs) }}</div>
+          <div class="value" v-if="avgPerItemMs !== null">{{ formatAvgPerItemSec(avgPerItemMs) }}</div>
           <div class="value value--muted" v-else>—</div>
         </Cell>
 
@@ -56,7 +56,7 @@
 
       <div class="row row--between row--wrap">
         <Small label="Start time:">{{ formatDateTime(data.startTime) }}</Small>
-        <Small label="Updated at:">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</Small>
+        <Small label="Last updated at:">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</Small>
       </div>
     </Card>
   </div>
@@ -147,6 +147,15 @@ const startTimeMs = computed(() => {
   return startDate.value ? startDate.value.getTime() : null
 })
 
+const elapsedMsToUpdatedAt = computed(() => {
+  if (startTimeMs.value === null || !updatedAtDate.value) {
+    return null
+  }
+  const end = updatedAtDate.value.getTime()
+  const elapsed = end - startTimeMs.value
+  return elapsed >= 0 ? elapsed : null
+})
+
 const remainingItems = computed(() => {
   return data.value ? Math.max(0, data.value.total - data.value.completed) : 0
 })
@@ -160,14 +169,10 @@ const progressPercent = computed(() => {
 })
 
 const avgPerItemMs = computed(() => {
-  if (!data.value || data.value.completed <= 0 || startTimeMs.value === null) {
+  if (!data.value || data.value.completed <= 0 || elapsedMsToUpdatedAt.value === null) {
     return null
   }
-  const elapsedMs = Date.now() - startTimeMs.value
-  if (elapsedMs < 0) {
-    return null
-  }
-  return elapsedMs / data.value.completed
+  return elapsedMsToUpdatedAt.value / data.value.completed
 })
 
 const etaMs = computed(() => {
@@ -178,8 +183,16 @@ const etaMs = computed(() => {
 })
 
 const etaDueAt = computed(() => {
-  return etaMs.value === null ? null : new Date(Date.now() + etaMs.value)
+  if (etaMs.value === null || !updatedAtDate.value) {
+    return null
+  }
+  return new Date(updatedAtDate.value.getTime() + etaMs.value)
 })
+
+const formatAvgPerItemSec = (ms: number) => {
+  const sec = Math.max(0, ms / 1000)
+  return `${new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(sec)} s`
+}
 
 const formatDuration = (ms: number) => {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000))
