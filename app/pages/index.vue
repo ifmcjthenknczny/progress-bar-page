@@ -54,6 +54,13 @@ const heading = computed(() => progressTitleFromData(data.value))
 
 let timer: ReturnType<typeof setInterval> | null = null
 
+const stopPolling = () => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+}
+
 const load = async () => {
   if (!id.value) {
     return
@@ -63,38 +70,43 @@ const load = async () => {
   try {
     const res = await $fetch<ProgressJson>(`/api/progress/${encodeURIComponent(id.value)}`)
     data.value = res
+    if (res.completed === res.total) {
+      stopPolling()
+    }
   } catch (e: any) {
     data.value = null
     error.value = e?.data?.statusMessage ?? e?.message ?? 'Unknown error'
   }
 }
 
-const startPolling = () => {
-  if (timer) {
-    clearInterval(timer)
-  }
+const startPolling = async () => {
+  stopPolling()
   if (!id.value) {
     return
   }
 
-  void load()
+  await load()
+  if (!id.value) {
+    return
+  }
+  if (data.value && data.value.completed === data.value.total) {
+    return
+  }
   timer = setInterval(() => void load(), PROGRESS_REFRESH_INTERVAL_MS)
 }
 
 onMounted(() => {
-  startPolling()
+  void startPolling()
 })
 
 onBeforeUnmount(() => {
-  if (timer) {
-    clearInterval(timer)
-  }
+  stopPolling()
 })
 
 watch(id, () => {
   data.value = null
   error.value = null
-  startPolling()
+  void startPolling()
 })
 </script>
 
