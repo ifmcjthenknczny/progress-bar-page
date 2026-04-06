@@ -20,7 +20,11 @@
     </Card>
 
     <Card v-else>
-      <ProgressDashboardPanel :data="data" />
+      <ProgressDashboardPanel
+        :data="data"
+        :due-time-label="data.completed === data.total ? 'Finished time' : 'Due time'"
+        :due-time-value="data.completed === data.total ? data.updatedAt : undefined"
+      />
     </Card>
   </div>
 </template>

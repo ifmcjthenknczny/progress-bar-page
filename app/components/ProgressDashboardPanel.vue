@@ -2,11 +2,11 @@
   <div>
     <div class="row row--between row--wrap">
       <Stat label="Processed">
-        {{ d.completed }} / {{ d.total }}
+        {{ progress.completed }} / {{ progress.total }}
       </Stat>
 
       <Stat label="Remaining" align-end>
-        {{ remainingItems }} / {{ d.total }}
+        {{ remainingItems }} / {{ progress.total }}
       </Stat>
     </div>
 
@@ -32,8 +32,8 @@
       </Cell>
 
       <Cell>
-        <template #label>Due time</template>
-        <div class="value" v-if="etaDueAt">{{ formatDateTime(etaDueAt) }}</div>
+        <template #label>{{ dueTimeLabel }}</template>
+        <div class="value" v-if="dueTimeDisplay">{{ formatDateTime(dueTimeDisplay) }}</div>
         <div class="value value--muted" v-else>—</div>
       </Cell>
     </div>
@@ -41,21 +41,21 @@
     <div class="divider" />
 
     <div class="row row--between row--wrap">
-      <Small label="Start time:">{{ formatDateTime(d.startTime) }}</Small>
+      <Small label="Start time:">{{ formatDateTime(progress.startTime) }}</Small>
       <Small label="Last updated at:">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</Small>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ProgressJson } from '#shared/types/progress'
 
 const props = defineProps<{
-  data: ProgressJson
-}>()
+    data: ProgressJson}>()
 
 const {
-  d,
+  progress,
   remainingItems,
   progressPercent,
   avgPerItemMs,
@@ -67,6 +67,12 @@ const {
   formatDuration,
   formatDateTime,
 } = useProgressDashboard(() => props.data)
+
+const dueTimeDisplay = computed(() =>
+  remainingItems.value === 0 ? updatedAtDate.value : etaDueAt.value,
+)
+
+const dueTimeLabel = computed(() => remainingItems.value === 0 ? 'Finished time' : 'Due time')
 </script>
 
 <style scoped>

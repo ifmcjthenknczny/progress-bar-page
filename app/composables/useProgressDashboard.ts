@@ -1,12 +1,12 @@
 import { computed, onBeforeUnmount, onMounted, ref, toValue, type MaybeRefOrGetter } from 'vue'
 import type { ProgressJson } from '#shared/types/progress'
 
-export const progressTitleFromData = (d: ProgressJson | null | undefined): string => {
-  if (!d) {
+export const progressTitleFromData = (progress: ProgressJson | null | undefined): string => {
+  if (!progress) {
     return 'Progress'
   }
-  const n = d.name?.trim()
-  return n ? `Progress of ${n}` : 'Progress'
+  const trimmedName = progress.name?.trim()
+  return trimmedName ? `Progress of ${trimmedName}` : 'Progress'
 }
 
 const toDate = (value: unknown): Date | null => {
@@ -20,7 +20,7 @@ const toDate = (value: unknown): Date | null => {
   return null
 }
 
-export const useProgressDashboard = (data: MaybeRefOrGetter<ProgressJson>) => {
+export const useProgressDashboard = (progressSource: MaybeRefOrGetter<ProgressJson>) => {
   const nowMs = ref(Date.now())
   let clockTimer: ReturnType<typeof setInterval> | null = null
 
@@ -36,10 +36,10 @@ export const useProgressDashboard = (data: MaybeRefOrGetter<ProgressJson>) => {
     }
   })
 
-  const d = computed(() => toValue(data))
+  const progress = computed(() => toValue(progressSource))
 
-  const startDate = computed(() => toDate(d.value.startTime))
-  const updatedAtDate = computed(() => toDate(d.value.updatedAt))
+  const startDate = computed(() => toDate(progress.value.startTime))
+  const updatedAtDate = computed(() => toDate(progress.value.updatedAt))
   const startTimeMs = computed(() => (startDate.value ? startDate.value.getTime() : null))
 
   const elapsedMsToUpdatedAt = computed(() => {
@@ -51,21 +51,21 @@ export const useProgressDashboard = (data: MaybeRefOrGetter<ProgressJson>) => {
     return elapsed >= 0 ? elapsed : null
   })
 
-  const remainingItems = computed(() => Math.max(0, d.value.total - d.value.completed))
+  const remainingItems = computed(() => Math.max(0, progress.value.total - progress.value.completed))
 
   const progressPercent = computed(() => {
-    if (d.value.total <= 0) {
+    if (progress.value.total <= 0) {
       return 0
     }
-    const raw = (d.value.completed / d.value.total) * 100
+    const raw = (progress.value.completed / progress.value.total) * 100
     return Math.min(100, Math.max(0, raw))
   })
 
   const avgPerItemMs = computed(() => {
-    if (d.value.completed <= 0 || elapsedMsToUpdatedAt.value === null) {
+    if (progress.value.completed <= 0 || elapsedMsToUpdatedAt.value === null) {
       return null
     }
-    return elapsedMsToUpdatedAt.value / d.value.completed
+    return elapsedMsToUpdatedAt.value / progress.value.completed
   })
 
   const etaMs = computed(() => {
@@ -94,10 +94,10 @@ export const useProgressDashboard = (data: MaybeRefOrGetter<ProgressJson>) => {
   })
 
   const jobComplete = computed(() => {
-    if (d.value.total <= 0) {
+    if (progress.value.total <= 0) {
       return false
     }
-    return d.value.completed >= d.value.total
+    return progress.value.completed >= progress.value.total
   })
 
   const runningTimeMs = computed(() => {
@@ -147,7 +147,7 @@ export const useProgressDashboard = (data: MaybeRefOrGetter<ProgressJson>) => {
   }
 
   return {
-    d,
+    progress,
     remainingItems,
     progressPercent,
     avgPerItemMs,
