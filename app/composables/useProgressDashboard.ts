@@ -20,6 +20,26 @@ const toDate = (value: unknown): Date | null => {
   return null
 }
 
+const PROGRESS_DATE_PARTS: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}
+
+const PROGRESS_TIME_PARTS: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+}
+
+const PROGRESS_DATETIME_FULL: Intl.DateTimeFormatOptions = {
+  ...PROGRESS_DATE_PARTS,
+  ...PROGRESS_TIME_PARTS,
+}
+
+const formatProgressDate = (dt: Date, options: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat(undefined, options).format(dt)
+
 export const useProgressDashboard = (progressSource: MaybeRefOrGetter<ProgressJson>) => {
   const nowMs = ref(Date.now())
   let clockTimer: ReturnType<typeof setInterval> | null = null
@@ -136,14 +156,18 @@ export const useProgressDashboard = (progressSource: MaybeRefOrGetter<ProgressJs
     if (!dt) {
       return '—'
     }
-    return new Intl.DateTimeFormat(undefined, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    }).format(dt)
+    return formatProgressDate(dt, PROGRESS_DATETIME_FULL)
+  }
+
+  const formatDateTimeParts = (value: string | Date): { date: string; time: string } | null => {
+    const dt = toDate(value)
+    if (!dt) {
+      return null
+    }
+    return {
+      date: formatProgressDate(dt, PROGRESS_DATE_PARTS),
+      time: formatProgressDate(dt, PROGRESS_TIME_PARTS),
+    }
   }
 
   return {
@@ -158,5 +182,6 @@ export const useProgressDashboard = (progressSource: MaybeRefOrGetter<ProgressJs
     formatAvgPerItemSec,
     formatDuration,
     formatDateTime,
+    formatDateTimeParts,
   }
 }

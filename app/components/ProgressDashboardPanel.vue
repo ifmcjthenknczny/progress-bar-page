@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="row row--between row--wrap">
+    <div class="row row--between row--stats">
       <Stat label="Processed">
         {{ progress.completed }} / {{ progress.total }}
       </Stat>
@@ -40,10 +40,7 @@
 
     <div class="divider" />
 
-    <div class="row row--between row--wrap">
-      <Small label="Start time:">{{ formatDateTime(progress.startTime) }}</Small>
-      <Small label="Last updated at:">{{ updatedAtDate ? formatDateTime(updatedAtDate) : '—' }}</Small>
-    </div>
+    <ProgressMetaTimes :start-parts="startParts" :updated-parts="updatedParts" />
   </div>
 </template>
 
@@ -52,7 +49,8 @@ import { computed } from 'vue'
 import type { ProgressJson } from '#shared/types/progress'
 
 const props = defineProps<{
-    data: ProgressJson}>()
+  data: ProgressJson
+}>()
 
 const {
   progress,
@@ -66,13 +64,20 @@ const {
   formatAvgPerItemSec,
   formatDuration,
   formatDateTime,
+  formatDateTimeParts,
 } = useProgressDashboard(() => props.data)
+
+const startParts = computed(() => formatDateTimeParts(progress.value.startTime))
+
+const updatedParts = computed(() =>
+  updatedAtDate.value ? formatDateTimeParts(updatedAtDate.value) : null,
+)
 
 const dueTimeDisplay = computed(() =>
   remainingItems.value === 0 ? updatedAtDate.value : etaDueAt.value,
 )
 
-const dueTimeLabel = computed(() => remainingItems.value === 0 ? 'Finished time' : 'Due time')
+const dueTimeLabel = computed(() => (remainingItems.value === 0 ? 'Finished time' : 'Due time'))
 </script>
 
 <style scoped>
@@ -86,8 +91,20 @@ const dueTimeLabel = computed(() => remainingItems.value === 0 ? 'Finished time'
   justify-content: space-between;
 }
 
-.row--wrap {
-  flex-wrap: wrap;
+.row--stats {
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+
+.row--stats :deep(.stat) {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+@media (max-width: 380px) {
+  .row--stats :deep(.stat .value) {
+    font-size: 16px;
+  }
 }
 
 .grid {
