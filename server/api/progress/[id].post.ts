@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
 import type { Progress } from '#shared/types/progress'
-import { ProgressParamsSchema, ProgressUpsertBodySchema } from '../../schemas/progress'
+import { ProgressParamsSchema, ProgressUpsertBody, ProgressUpsertBodySchema } from '../../schemas/progress'
 import { upsertProgress } from '../../db/progressRepo'
 import { badRequest, zodFieldIssues } from '../../utils/apiError'
 
@@ -59,12 +59,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const progress: Progress = {
+  const progress: ProgressUpsertBody = {
     id: paramsParse.data.id,
     completed: bodyParse.data.completed,
     total: bodyParse.data.total,
     startTime: bodyParse.data.startTime,
-    updatedAt: new Date(),
     ...(bodyParse.data.name !== undefined ? { name: bodyParse.data.name } : {}),
   }
 

@@ -1,1 +1,3 @@
 export const PROGRESS_REFRESH_INTERVAL_MS = 15_000
+
+export const PROGRESS_TTL_AFTER_UPDATE_MS = 7 * 24 * 60 * 60 * 1000 // week

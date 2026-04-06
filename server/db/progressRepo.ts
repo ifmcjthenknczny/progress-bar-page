@@ -1,6 +1,7 @@
-import type { Progress } from '#shared/types/progress'
+import type { Progress, ProgressUpsertBody, ProgressUpserted } from '#shared/types/progress'
 import { ProgressModel } from './progressModel'
 import { ensureMongooseConnected } from './mongoose'
+import { PROGRESS_TTL_AFTER_UPDATE_MS } from '~~/shared/config'
 
 export type { Progress } from '#shared/types/progress'
 
@@ -22,14 +23,17 @@ export const getProgressById = async (id: string): Promise<Progress | null> => {
   }
 }
 
-export const upsertProgress = async (progress: Progress): Promise<Progress> => {
+export const upsertProgress = async (progress: ProgressUpserted): Promise<Progress> => {
   await ensureMongooseConnected()
+
+  const updatedAt = new Date()
 
   const $set: Record<string, unknown> = {
     completed: progress.completed,
     total: progress.total,
     startTime: progress.startTime,
-    updatedAt: new Date(),
+    updatedAt,
+    expiresAt: new Date(updatedAt.getTime() + PROGRESS_TTL_AFTER_UPDATE_MS),
   }
   if (progress.name !== undefined) {
     $set.name = progress.name
@@ -56,6 +60,7 @@ export const upsertProgress = async (progress: Progress): Promise<Progress> => {
     total: obj.total,
     startTime: obj.startTime,
     updatedAt: obj.updatedAt ?? obj.startTime,
+    ...(obj.expiresAt instanceof Date ? { expiresAt: obj.expiresAt } : {}),
     ...(typeof obj.name === 'string' && obj.name.length > 0 ? { name: obj.name } : {}),
   }
 }

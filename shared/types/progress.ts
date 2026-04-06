@@ -8,6 +8,7 @@ export interface ProgressFields {
 export interface Progress extends ProgressFields {
   startTime: Date
   updatedAt: Date
+  expiresAt?: Date
 }
 
 export interface ProgressJson extends ProgressFields {
@@ -20,4 +21,8 @@ export interface ProgressUpsertBody {
   total: number
   startTime: Date
   name?: string
+}
+
+export interface ProgressUpserted extends ProgressUpsertBody {
+  id: string
 }

@@ -4710,7 +4710,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^7.1.1, mongodb@npm:~7.1":
+"mongodb@npm:~7.1":
   version: 7.1.1
   resolution: "mongodb@npm:7.1.1"
   dependencies:
@@ -5939,7 +5939,6 @@ __metadata:
   resolution: "progress-bar-page@workspace:."
   dependencies:
     "@types/node": "npm:^25.5.0"
-    mongodb: "npm:^7.1.1"
     mongoose: "npm:^9.3.3"
     nuxt: "npm:^4.4.2"
     vue: "npm:^3.5.31"

@@ -23,6 +23,7 @@ const progressSchema = new Schema(
     },
     startTime: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
+    expiresAt: { type: Date, required: false },
     name: { type: String, required: false },
   },
   {
@@ -31,6 +32,8 @@ const progressSchema = new Schema(
     timestamps: false,
   },
 )
+
+progressSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
 
 export type ProgressModelAttrs = InferSchemaType<typeof progressSchema>
 
