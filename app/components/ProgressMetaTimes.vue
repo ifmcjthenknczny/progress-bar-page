@@ -61,7 +61,7 @@ const rows = computed(() => [
   min-width: 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.25;
   text-align: right;
@@ -73,7 +73,7 @@ const rows = computed(() => [
 }
 
 .meta-time {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   opacity: 0.9;
 }
@@ -92,6 +92,19 @@ const rows = computed(() => [
 }
 
 @media (min-width: 640px) {
+  .meta-row {
+    align-items: center;
+    gap: 12px clamp(28px, 5vw, 56px);
+  }
+
+  .meta-block {
+    align-items: center;
+  }
+
+  .meta-label {
+    padding-top: 0;
+  }
+
   .meta-datetime {
     flex-direction: row;
     flex-wrap: nowrap;
