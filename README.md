@@ -35,6 +35,9 @@ Open:
 yarn build
 ```
 
+## TODO
+* Save updates progressively and create a speed chart out of it.
+
 ## License
 
 This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/).
