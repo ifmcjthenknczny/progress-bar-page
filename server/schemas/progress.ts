@@ -10,7 +10,6 @@ export const ProgressParamsSchema = z.object({
 
 export const ProgressUpsertBodySchema = z
   .object({
-    id: ProgressIdSchema,
     completed: CoercedIntSchema,
     total: CoercedIntSchema,
     startTime: z.coerce.date(),
